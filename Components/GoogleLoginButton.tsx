@@ -2,7 +2,7 @@
 import { ChakraProvider, Box, Button } from '@chakra-ui/react';
 
 interface props {
-  onClick: (event: MouseEvent) => void;
+  onClick: () => void;
 }
 
 export const GoogleLoginButton = function ({onClick} : props) {

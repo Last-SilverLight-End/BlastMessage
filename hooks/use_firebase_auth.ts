@@ -13,6 +13,21 @@ export default function useFirebaseAuth() {
       const signInResult = await signInWithPopup(FirebaseClient.getInstance().Auth, provider);
       if (signInResult.user) {
         console.info(signInResult.user);
+        const dataResponese = await fetch('api/members_add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            uid: signInResult.user.uid,
+            email: signInResult.user.email,
+            displayName: signInResult.user.displayName,
+            photoURL: signInResult.user.photoURL,
+          }),
+        });
+        console.info({ status: dataResponese.status });
+        const dataResult = await dataResponese.json();
+        console.info(dataResult);
       }
     } catch (err) {
       console.error(err);
@@ -35,7 +50,7 @@ export default function useFirebaseAuth() {
     setAuthUser({
       uid: authState.uid,
       email: authState.email,
-      photoUrl: authState.photoURL,
+      photoURL: authState.photoURL,
       displayName: authState.displayName,
     });
     setLoading(false);
