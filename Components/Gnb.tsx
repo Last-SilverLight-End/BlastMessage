@@ -2,14 +2,25 @@ import { Box, Button, Flex, Spacer } from '@chakra-ui/react';
 import { useAuth } from '@/contexts/auth_user.context';
 
 const Gnb = function () {
-  const { loading, authUser, signOut } = useAuth();
-  const logoutBtn = <Button onClick={signOut}>로그아웃</Button>;
+  const { loading, authUser, signOut, signInWithGoogle } = useAuth();
+
   const loginBtn = (
-    <Button fontSize="sm" fontWeight={600} color="white" bg="pink.400" _hover={{ bg: 'pink.300' }} onClick={signOut}>
+    <Button
+      fontSize="sm"
+      fontWeight={600}
+      color="white"
+      bg="pink.400"
+      _hover={{ bg: 'pink.300' }}
+      onClick={signInWithGoogle}
+    >
       로그인
     </Button>
   );
-
+  const logoutBtn = (
+    <Button as="a" fontWeight={400} onClick={signOut}>
+      로그아웃
+    </Button>
+  );
   const authInitialized = loading || authUser === null;
   return (
     <Box borderBottom={1} borderStyle="solid" borderColor="gray.200" bg="white">
