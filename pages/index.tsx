@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/auth_user.context';
 
 const IndexPage: NextPage = function () {
   const { signInWithGoogle } = useAuth();
+
   return (
     <ServiceLayout title="test" backgroundColor="green.200">
       <Center>

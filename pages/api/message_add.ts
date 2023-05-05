@@ -4,16 +4,16 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import MemberCtrl from '@/controllers/member.ctrl';
 import handleError from '@/controllers/error/handle_error';
 import checkSupportMethod from '@/controllers/error/check_support_method';
+import MessageCrtl from '@/controllers/message.ctrl';
 
-export default async function add(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
-  const supportedMethond = ['POST', undefined];
+  const supportedMethod = ['POST'];
   try {
-    checkSupportMethod(supportedMethond, method);
-    await MemberCtrl.add(req, res);
+    checkSupportMethod(supportedMethod, method);
+    await MessageCrtl.post(req, res);
   } catch (err) {
     console.error(err);
-    //TODO 에러처리
     handleError(err, res);
   }
 }
