@@ -13,62 +13,18 @@ interface UserProps {
   userMessage: string | null;
 }
 
-async function postMessage({
-  uid,
-  message,
-  author,
-}: {
-  uid: string;
-  message: string;
-  author?: {
-    displayName: string;
-    photoURL?: string;
-  };
-}) {
-  if (message.length <= 0) {
-    return {
-      result: false,
-      message: '메세지가 없습니다. 입력해주세요',
-    };
-  }
-  try {
-    await fetch('/api/message_add', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        uid,
-        message,
-        author,
-      }),
-    });
-    return {
-      result: true,
-    };
-  } catch (err) {
-    console.log(err);
-    return {
-      result: false,
-      message: '메세지 등록 실패',
-    };
-  }
-}
-
 const UserHomePage: NextPage<UserProps> = function ({ userInfo }) {
   const [check, setCheck] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [IsNoOne, setNoOne] = useState<boolean>(true);
   const { authUser } = useAuth();
   const toast = useToast();
-
-  if (userInfo === null) {
-    console.log(userInfo);
-    return (
-      <Box>
-        <Text> 사용자를 찾을수 없습니다 새로고침이나 다시 로그인 해주세요</Text>
-      </Box>
-    );
+  console.log(userInfo);
+  if (userInfo === null || userInfo === undefined) {
+    return <Text> 사용자를 찾을수 없습니다 새로고침이나 다시 로그인 해주세요</Text>;
+  }
+  if (userInfo.photoURL == null) {
+    return <Text>잘못되었습니다</Text>;
   }
 
   const onChangeMessage = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -101,12 +57,12 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }) {
       <Box maxW="md" mx="auto" pt="6">
         <Box borderWidth="1px" borderRadius="lg" overflow="hidden" mb="2" bg="white">
           <Flex>
-            <Avatar size="lg" src={userInfo?.photoURL ?? 'https://bit.ly/broken-link'} mr="2" />
+            <Avatar size="lg" src={userInfo.photoURL} mr="2" />
             <Flex direction="column" justify="center">
               <Text fontWeight="bold" fontSize="md">
-                {userInfo?.displayName}
+                {userInfo.displayName}
               </Text>
-              <Text fontSize="md">{userInfo?.email}</Text>
+              <Text fontSize="md">{userInfo.email}</Text>
             </Flex>
           </Flex>
         </Box>
@@ -132,42 +88,7 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }) {
               value={message}
               onChange={onChangeMessage}
             />
-            {/**나중에 따로 onclick 빼내기 */}
-            <Button
-              onClick={async () => {
-                const postData: {
-                  message: string;
-                  uid: string;
-                  author?: {
-                    displayName: string;
-                    photoURL: string;
-                  };
-                } = {
-                  message,
-                  uid: userInfo.uid,
-                };
-                if (IsNoOne === false) {
-                  postData.author = {
-                    photoURL: authUser?.photoURL ?? 'https://bit.ly/broken-link',
-                    displayName: authUser?.displayName ?? 'IsNoOne',
-                  };
-                }
-                const messageRes = await postMessage(postData);
-
-                if (messageRes.result === false) {
-                  toast({
-                    title: '메세지 등록 실패',
-                    position: 'top-start',
-                  });
-                }
-              }}
-              disabled={!check}
-              bgColor="#26bd00d6"
-              color="white"
-              colorScheme="yellow"
-              variant="solid"
-              size="sm"
-            >
+            <Button disabled={!check} bgColor="#26bd00d6" color="white" colorScheme="yellow" variant="solid" size="sm">
               올리기
             </Button>
           </Flex>
@@ -182,6 +103,42 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }) {
       </Box>
     </ServiceLayout>
   );
+};
+
+export const getServerSideProps: GetServerSideProps<UserProps> = async ({ query }) => {
+  const { screenName } = query;
+  if (screenName === undefined) {
+    return {
+      props: {
+        userInfo: null,
+        userMessage: '찾을수 없습니다',
+      },
+    };
+  }
+  try {
+    const protocol = process.env.PROTOCOL ?? 'http';
+    const port = process.env.PORT ?? '3000';
+    const host = process.env.HOST ?? 'localhost';
+    const curUrl = `${protocol}://${host}:${port}`;
+
+    const userInfoAxios = await axios<InAuthUser>(`${curUrl}/api/user_info/${screenName}`);
+
+    console.log(userInfoAxios.data);
+    return {
+      props: {
+        userInfo: userInfoAxios.data ?? null,
+        userMessage: '가져오기 성공',
+      },
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      props: {
+        userInfo: null,
+        userMessage: `에러 발생 : ${err}`,
+      },
+    };
+  }
 };
 
 export default UserHomePage;
