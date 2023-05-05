@@ -9,8 +9,8 @@ const Gnb = function () {
       fontSize="sm"
       fontWeight={600}
       color="white"
-      bg="pink.400"
-      _hover={{ bg: 'pink.300' }}
+      bg="green.400"
+      _hover={{ bg: 'green.300' }}
       onClick={signInWithGoogle}
     >
       로그인
@@ -27,7 +27,7 @@ const Gnb = function () {
       <Flex minH="60px" py={{ base: 2 }} px={{ base: 4 }} align="center" maxW="md" mx="auto">
         <Spacer />
         <Box flex="1">
-          <img style={{ height: '40px' }} src="/logo.svg" alt="logo" />
+          <img style={{ height: '40px' }} src="/slimesafd.png" alt="logo" />
         </Box>
         <Box justifyContent="flex-end">{authInitialized ? loginBtn : logoutBtn}</Box>
       </Flex>
