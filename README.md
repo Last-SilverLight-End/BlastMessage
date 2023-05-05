@@ -7,6 +7,7 @@ Blastblast
  + 광장에서 하고 싶은말 못하고 싶은말 다 하세요!
  + 간단한 로그인으로 들어갈 수 있어요!
  
- ## 메인 페이지
+ ## 로그인 화면
  
-![image](https://user-images.githubusercontent.com/68593892/236366627-6a6c9763-69f8-48a5-a7f0-ce7e1a0fc9ad.png)
+![image](https://user-images.githubusercontent.com/68593892/236367915-25c58bf2-d5a4-4bb6-ad72-318be6bf714d.png)
+ + 간단한 방식으로 로그인 할 수 있어요!
