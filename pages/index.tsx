@@ -10,15 +10,17 @@ import { useAuth } from '@/contexts/auth_user.context';
 const IndexPage: NextPage = function () {
   const { signInWithGoogle } = useAuth();
   return (
-    <ServiceLayout title="test" backgroundColor="gray.100">
-      <Box maxW="md" mx="auto" pt="10">
-        <img src="/main_logo.svg" alt="메인로고" />
-        <Flex justify="center">
-          <Heading>#blastBlast</Heading>
-        </Flex>
-      </Box>
-      <Center mt="20">
-        <GoogleLoginButton onClick={signInWithGoogle} />
+    <ServiceLayout title="test" backgroundColor="green.200">
+      <Center>
+        <Box maxW="md" m="auto" pt="10">
+          <img src="/unknown.png" alt="메인로고" />
+          <Flex justify="center">
+            <Heading color="black.100">BlastChat</Heading>
+          </Flex>
+          <Center mt="20" mb="20">
+            <GoogleLoginButton onClick={signInWithGoogle} />
+          </Center>
+        </Box>
       </Center>
     </ServiceLayout>
   );
