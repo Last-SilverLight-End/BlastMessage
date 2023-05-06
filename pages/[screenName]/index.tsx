@@ -14,7 +14,7 @@ interface UserProps {
 }
 
 const UserHomePage: NextPage<UserProps> = function ({ userInfo }) {
-  const [check, setCheck] = useState<boolean>(false);
+  const [check, setCheck] = useState<boolean>(true);
   const [message, setMessage] = useState<string>('');
   const [IsNoOne, setNoOne] = useState<boolean>(true);
   const { authUser } = useAuth();
@@ -37,8 +37,10 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }) {
         title: '최대 10줄까지 입력 가능합니다',
         position: 'top-start',
       });
-      setCheck(false);
+      setCheck(true);
+      return;
     }
+    setCheck(false);
   };
 
   const checkUser = () => {
@@ -88,7 +90,7 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }) {
               value={message}
               onChange={onChangeMessage}
             />
-            <Button disabled={!check} bgColor="#26bd00d6" color="white" colorScheme="yellow" variant="solid" size="sm">
+            <Button disabled={check} bgColor="#26bd00d6" color="white" colorScheme="yellow" variant="solid" size="sm">
               올리기
             </Button>
           </Flex>
