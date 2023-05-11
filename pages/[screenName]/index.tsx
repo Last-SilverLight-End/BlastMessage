@@ -1,8 +1,20 @@
 import { GetServerSideProps, NextPage } from 'next';
-import { Avatar, Box, Text, Flex, Textarea, Button, useToast, FormControl, Switch, FormLabel } from '@chakra-ui/react';
+import {
+  Avatar,
+  Box,
+  Text,
+  Flex,
+  Textarea,
+  Button,
+  useToast,
+  FormControl,
+  Switch,
+  FormLabel,
+  VStack,
+} from '@chakra-ui/react';
 import FlexiableTextArea from 'react-textarea-autosize';
 import { SetStateAction, useState } from 'react';
-import { async } from '@firebase/util';
+
 import axios, { AxiosResponse } from 'axios';
 import { ServiceLayout } from '@/Components/ServiceLayout';
 import { useAuth } from '@/contexts/auth_user.context';
@@ -35,7 +47,7 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }) {
     if (lineCount > 10) {
       toast({
         title: '최대 10줄까지 입력 가능합니다',
-        position: 'top-start',
+        position: 'top-left',
       });
       setCheck(true);
       return;
@@ -47,7 +59,7 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }) {
     if (authUser === null) {
       toast({
         title: '로그인 후 사용 가능합니다',
-        position: 'top-start',
+        position: 'top-left',
       });
       return;
     }
@@ -102,6 +114,9 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }) {
           </FormControl>
           {/*{message.length},{check}*/}
         </Box>
+        <VStack spacing="12px" mt="6">
+          <MessageItem />
+        </VStack>
       </Box>
     </ServiceLayout>
   );

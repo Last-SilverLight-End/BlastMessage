@@ -18,6 +18,7 @@ const Gnb = function () {
   );
   const logoutBtn = (
     <Button as="a" fontWeight={400} onClick={signOut}>
+      {signOut}
       로그아웃
     </Button>
   );

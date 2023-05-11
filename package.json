@@ -8,18 +8,20 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@chakra-ui/react": "1.8",
-    "@emotion/react": "11",
-    "@emotion/styled": "11",
+    "@chakra-ui/react": "^2.6.1",
+    "@emotion/react": "^11.10.8",
+    "@emotion/styled": "^11.10.8",
     "axios": "^1.4.0",
     "firebase": "^9.21.0",
     "firebase-admin": "^11.7.0",
-    "framer-motion": "6",
-    "next": "12.0.7",
-    "react": "17.0.2",
-    "react-dom": "17.0.2",
+    "framer-motion": "^10.12.8",
+    "next": "^13.4.1",
+    "npm": "^9.6.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-textarea-autosize": "^8.4.1",
-    "styled-components": "^5.3.3"
+    "styled-components": "^5.3.3",
+    "upgrade": "^1.1.0"
   },
   "devDependencies": {
     "@types/node": "^16.11.13",
@@ -33,7 +35,7 @@
     "eslint-config-airbnb": "^19.0.2",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^16.1.0",
-    "eslint-config-next": "12.0.7",
+    "eslint-config-next": "^13.4.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-babel": "^5.3.1",
     "eslint-plugin-import": "^2.25.3",
