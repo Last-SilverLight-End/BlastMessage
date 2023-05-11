@@ -19,6 +19,7 @@ import axios, { AxiosResponse } from 'axios';
 import { ServiceLayout } from '@/Components/ServiceLayout';
 import { useAuth } from '@/contexts/auth_user.context';
 import { InAuthUser } from '@/models/in_auth_user';
+import MessageItem from '@/Components/message_item';
 
 interface UserProps {
   userInfo: InAuthUser | null | undefined;
@@ -115,6 +116,7 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }) {
           {/*{message.length},{check}*/}
         </Box>
         <VStack spacing="12px" mt="6">
+          <MessageItem />
           <MessageItem />
         </VStack>
       </Box>
