@@ -116,8 +116,19 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }) {
           {/*{message.length},{check}*/}
         </Box>
         <VStack spacing="12px" mt="6">
-          <MessageItem />
-          <MessageItem />
+          <MessageItem
+            uid="hello"
+            photoURL={authUser?.photoURL ?? ''}
+            displayName="testest"
+            owner={false}
+            item={{
+              id: 'test',
+              message: 'test_hellofuckingworld',
+              createAt: '2022-01-31T20:15:55+09:00',
+              reply: 'reply',
+              replyAt: '2022-03-31T20:15:55+09:00',
+            }}
+          />
         </VStack>
       </Box>
     </ServiceLayout>

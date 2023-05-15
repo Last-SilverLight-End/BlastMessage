@@ -1,14 +1,17 @@
-import { Avatar, Box, Flex, Text } from '@chakra-ui/react';
+import { Avatar, Box, Divider, Flex, Text } from '@chakra-ui/react';
 import { InMessage } from '@/models/message/in_message';
+import convertDateToString from '@/utils/convert_date_toString';
 
 interface Props {
   uid: string;
+  photoURL: string;
   displayName: string;
   owner: boolean;
   item: InMessage;
 }
 
-const MessageItem = function ({ item }: Props) {
+const MessageItem = function ({ displayName, photoURL, item }: Props) {
+  const haveReply = item.reply !== undefined;
   return (
     <Box borderRadius="md" width="full" bg="white" boxShadow="md">
       <Box>
@@ -21,7 +24,7 @@ const MessageItem = function ({ item }: Props) {
             {item.author ? item.author.displayName : 'IsNoOne'}
           </Text>
           <Text whiteSpace="pre-line" fontSize="xx-small" color="gray.300" m="1">
-            1일
+            {convertDateToString(item.createAt)}
           </Text>
         </Flex>
       </Box>
@@ -31,6 +34,27 @@ const MessageItem = function ({ item }: Props) {
             {item.message}
           </Text>
         </Box>
+        {haveReply && (
+          <Box pt="2">
+            <Divider />
+            <Box display="flex" mt="2">
+              <Box pt="2">
+                <Avatar size="xs" src={photoURL} mr="2" />
+              </Box>
+              <Box borderRadius="md" p="2" width="full" bg="gray.200">
+                <Flex alignItems="center">
+                  <Text fontSize="xs">{displayName}</Text>
+                  <Text whiteSpace="pre-line" fontSize="xs" color="gray">
+                    {convertDateToString(item.replyAt!)}
+                  </Text>
+                </Flex>
+                <Text whiteSpace="pre-line" fontSize="xs">
+                  {item.reply}
+                </Text>
+              </Box>
+            </Box>
+          </Box>
+        )}
       </Box>
     </Box>
   );
