@@ -120,6 +120,17 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }) {
             uid="hello"
             photoURL={authUser?.photoURL ?? ''}
             displayName="testest"
+            owner
+            item={{
+              id: 'test',
+              message: 'test_hellofuckingworld',
+              createAt: '2022-02-31T20:15:55+09:00',
+            }}
+          />
+          <MessageItem
+            uid="hello"
+            photoURL={authUser?.photoURL ?? ''}
+            displayName="testest"
             owner={false}
             item={{
               id: 'test',
