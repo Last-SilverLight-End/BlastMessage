@@ -13,13 +13,14 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import FlexiableTextArea from 'react-textarea-autosize';
-import { SetStateAction, useState } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
 
 import axios, { AxiosResponse } from 'axios';
 import { ServiceLayout } from '@/Components/ServiceLayout';
 import { useAuth } from '@/contexts/auth_user.context';
 import { InAuthUser } from '@/models/in_auth_user';
 import MessageItem from '@/Components/message_item';
+import { InMessage } from '@/models/message/in_message';
 
 interface UserProps {
   userInfo: InAuthUser | null | undefined;
@@ -30,8 +31,27 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }) {
   const [check, setCheck] = useState<boolean>(true);
   const [message, setMessage] = useState<string>('');
   const [IsNoOne, setNoOne] = useState<boolean>(true);
+  const [messageList, setMessageList] = useState<Array<InMessage>>([]);
   const { authUser } = useAuth();
   const toast = useToast();
+
+  async function fetchMessageList(uid: string) {
+    try {
+      const res = await fetch(`/api/message_list?uid=${uid}`);
+      if (res.status === 200) {
+        const data = await res.json();
+        setMessageList(data);
+      }
+    } catch (err) {
+      console.log(err);
+    };
+  };
+  const isOwner = authUser !== null && authUser.uid === userInfo.uid;
+  useEffect(() => {
+    if (userInfo === null) return;
+    fetchMessageList(userInfo.uid);
+  }, [userInfo])
+
   console.log(userInfo);
   if (userInfo === null || userInfo === undefined) {
     return <Text> 사용자를 찾을수 없습니다 새로고침이나 다시 로그인 해주세요</Text>;
@@ -116,7 +136,17 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }) {
           {/*{message.length},{check}*/}
         </Box>
         <VStack spacing="12px" mt="6">
-          <MessageItem
+          {messageList.map((messageData) => {
+            return <MessageItem
+              key={`message-item-${userInfo.uid}-${messageData.id}`}
+              item={messageData}
+              uid={userInfo.uid}
+              displayName={userInfo.displayName ?? ''}
+              photoURL={userInfo.photoURL ?? 'https://bit.ly/broken-link'}
+              owner={isOwner}></MessageItem>
+          })}
+          {/*
+        <MessageItem   
             uid="hello"
             photoURL={authUser?.photoURL ?? ''}
             displayName="testest"
@@ -139,7 +169,8 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }) {
               reply: 'reply',
               replyAt: '2022-03-31T20:15:55+09:00',
             }}
-          />
+          />*/}
+
         </VStack>
       </Box>
     </ServiceLayout>
