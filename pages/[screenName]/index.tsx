@@ -27,7 +27,7 @@ interface UserProps {
   userMessage: string | null;
 }
 
-const UserHomePage: NextPage<UserProps> = function ({ userInfo }) {
+const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
   const [check, setCheck] = useState<boolean>(true);
   const [message, setMessage] = useState<string>('');
   const [IsNoOne, setNoOne] = useState<boolean>(true);
