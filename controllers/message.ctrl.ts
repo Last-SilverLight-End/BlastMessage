@@ -15,6 +15,16 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   return res.status(201).end();
 }
 
-const MessageCrtl = { post };
+async function list(req: NextApiRequest, res: NextApiResponse) {
+  const { uid } = req.query;
+
+  if (uid === undefined) {
+    throw new BadReqError('uid가 존재하지 않습니다.');
+  }
+  const uidToString = Array.isArray(uid) ? uid[0] : uid;
+  const listResp = await MessageModel.list({ uid: uidToString });
+  return res.status(200).json(listResp);
+}
+const MessageCrtl = { post, list };
 
 export default MessageCrtl;
