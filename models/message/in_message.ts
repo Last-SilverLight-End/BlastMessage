@@ -1,4 +1,4 @@
-import { firestore } from "firebase-admin";
+import { firestore } from 'firebase-admin';
 
 interface MessageBase {
   id: string;
@@ -21,6 +21,4 @@ export interface InMessage extends MessageBase {
 export interface InMessageServer extends MessageBase {
   createAt: firestore.Timestamp;
   replyAt?: firestore.Timestamp;
-
-
 }

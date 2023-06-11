@@ -43,14 +43,15 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
         setMessageList(data);
       }
     } catch (err) {
-      console.log(err);
-    };
-  };
-  const isOwner = authUser !== null && authUser.uid === userInfo.uid;
+      console.log('error : ', err);
+    }
+  }
   useEffect(() => {
     if (userInfo === null) return;
     fetchMessageList(userInfo.uid);
-  }, [userInfo])
+  }, [userInfo]);
+
+  const isOwner = authUser !== null && authUser.uid === userInfo.uid;
 
   console.log(userInfo);
   if (userInfo === null || userInfo === undefined) {
@@ -136,15 +137,17 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
           {/*{message.length},{check}*/}
         </Box>
         <VStack spacing="12px" mt="6">
-          {messageList.map((messageData) => {
-            return <MessageItem
+          {messageList.map((messageData) => (
+            <MessageItem
               key={`message-item-${userInfo.uid}-${messageData.id}`}
               item={messageData}
               uid={userInfo.uid}
               displayName={userInfo.displayName ?? ''}
               photoURL={userInfo.photoURL ?? 'https://bit.ly/broken-link'}
-              owner={isOwner}></MessageItem>
-          })}
+              owner={isOwner}
+            />
+          ))}
+
           {/*
         <MessageItem   
             uid="hello"
@@ -170,7 +173,6 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
               replyAt: '2022-03-31T20:15:55+09:00',
             }}
           />*/}
-
         </VStack>
       </Box>
     </ServiceLayout>

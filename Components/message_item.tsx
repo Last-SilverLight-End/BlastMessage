@@ -44,7 +44,7 @@ const MessageItem = function ({ uid, displayName, owner, photoURL, item }: Props
               </Box>
               <Box borderRadius="md" p="2" width="full" bg="gray.200">
                 <Flex alignItems="center">
-                  <Text fontSize="xs">{displayName}</Text>
+                  <Text fontSize="xs">{`${displayName}`}</Text>
                   <Text whiteSpace="pre-line" fontSize="xs" color="gray">
                     {convertDateToString(item.replyAt!)}
                   </Text>

@@ -25,6 +25,23 @@ async function list(req: NextApiRequest, res: NextApiResponse) {
   const listResp = await MessageModel.list({ uid: uidToString });
   return res.status(200).json(listResp);
 }
-const MessageCrtl = { post, list };
+
+async function postReply(req: NextApiRequest, res: NextApiResponse) {
+  const { uid, messageId, reply } = req.body;
+
+  if (uid === undefined) {
+    throw new BadReqError('uid가 존재하지 않습니다.');
+  }
+  if (messageId === undefined) {
+    throw new BadReqError('메세지가 존재하지 않습니다.');
+  }
+  if (reply === undefined) {
+    throw new BadReqError('reply가 누락되어 있습니다.');
+  }
+  await MessageModel.postReply({ uid, messageId, reply });
+  return res.status(201).end();
+}
+
+const MessageCrtl = { post, list, postReply };
 
 export default MessageCrtl;
