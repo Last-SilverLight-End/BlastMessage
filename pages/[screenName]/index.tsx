@@ -90,6 +90,27 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
       console.log('error : ', err);
     }
   }
+
+  async function fetchMessageInfo({ uid, messageId }: { uid: string; messageId: string }) {
+    try {
+      const res = await fetch(`/api/message_info?uid=${uid}&messageId=${messageId}`);
+      if (res.status === 200) {
+        const data: InMessage = await res.json();
+        setMessageList((prev) => {
+          const findIndex = prev.findIndex((finding) => finding.id === data.id);
+          if (findIndex >= 0) {
+            const updateArr = [...prev];
+            updateArr[findIndex] = data;
+            return updateArr;
+          }
+          return prev;
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   useEffect(() => {
     if (userInfo === null) return;
     fetchMessageList(userInfo.uid);
@@ -255,42 +276,6 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
       </Box>
     </ServiceLayout>
   );
-};
-
-export const getServerSideProps: GetServerSideProps<UserProps> = async ({ query }) => {
-  const { screenName } = query;
-  if (screenName === undefined) {
-    return {
-      props: {
-        userInfo: null,
-        userMessage: '찾을수 없습니다',
-      },
-    };
-  }
-  try {
-    const protocol = process.env.PROTOCOL ?? 'http';
-    const port = process.env.PORT ?? '3000';
-    const host = process.env.HOST ?? 'localhost';
-    const curUrl = `${protocol}://${host}:${port}`;
-
-    const userInfoAxios = await axios<InAuthUser>(`${curUrl}/api/user_info/${screenName}`);
-
-    console.log(userInfoAxios.data);
-    return {
-      props: {
-        userInfo: userInfoAxios.data ?? null,
-        userMessage: '가져오기 성공',
-      },
-    };
-  } catch (err) {
-    console.error(err);
-    return {
-      props: {
-        userInfo: null,
-        userMessage: `에러 발생 : ${err}`,
-      },
-    };
-  }
 };
 
 export default UserHomePage;
