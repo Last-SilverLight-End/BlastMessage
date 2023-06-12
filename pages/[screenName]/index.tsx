@@ -219,6 +219,7 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
                   toast({ title: '메세지 등록 실패', position: 'top-right' });
                 }
                 setMessage('');
+                setMessageListFetchTrig((prev) => !prev);
               }}
             >
               올리기
@@ -242,7 +243,7 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
               photoURL={userInfo.photoURL ?? 'https://bit.ly/broken-link'}
               owner={isOwner}
               onSendComplete={() => {
-                setMessageListFetchTrig((prev) => !prev);
+                fetchMessageInfo({ uid: userInfo.uid, messageId: messageData.id });
               }}
             />
           ))}
@@ -276,6 +277,42 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
       </Box>
     </ServiceLayout>
   );
+};
+
+export const getServerSideProps: GetServerSideProps<UserProps> = async ({ query }) => {
+  const { screenName } = query;
+  if (screenName === undefined) {
+    return {
+      props: {
+        userInfo: null,
+        userMessage: '찾을수 없습니다',
+      },
+    };
+  }
+  try {
+    const protocol = process.env.PROTOCOL ?? 'http';
+    const port = process.env.PORT ?? '3000';
+    const host = process.env.HOST ?? 'localhost';
+    const curUrl = `${protocol}://${host}:${port}`;
+
+    const userInfoAxios = await axios<InAuthUser>(`${curUrl}/api/user_info/${screenName}`);
+
+    console.log(userInfoAxios.data);
+    return {
+      props: {
+        userInfo: userInfoAxios.data ?? null,
+        userMessage: '가져오기 성공',
+      },
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      props: {
+        userInfo: null,
+        userMessage: `에러 발생 : ${err}`,
+      },
+    };
+  }
 };
 
 export default UserHomePage;

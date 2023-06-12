@@ -60,7 +60,7 @@ async function list({ uid }: { uid: string }) {
       throw new CustomServerError({ statusCode: 400, message: '존재하지 않는 사용자' });
     }
 
-    const messageCol = memberRef.collection(MSG_COL);
+    const messageCol = memberRef.collection(MSG_COL).orderBy('createAt', 'desc');
     const messageColDoc = await transaction.get(messageCol);
     const data = messageColDoc.docs.map((mapValue) => {
       const docData = mapValue.data() as Omit<InMessageServer, 'id'>;
@@ -92,6 +92,7 @@ async function get({ uid, messageId }: { uid: string; messageId: string }) {
     const messageData = messageDoc.data() as InMessageServer;
     return {
       ...messageData,
+      id: messageId,
       createAt: messageData.createAt.toDate().toISOString(),
       replyAt: messageData.replyAt ? messageData.replyAt.toDate().toISOString() : undefined,
     };
