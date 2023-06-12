@@ -23,14 +23,14 @@ async function post({
     photoURL?: string;
   };
 }) {
-  const memberRef = Firestore.collection(MEMBER_COL).doc(uid);
-
-  await Firestore.runTransaction(async (transaction) => {
+  const memberRef = FirebaseAdmin.getInstance().Firestore.collection(MEMBER_COL).doc(uid);
+  await FirebaseAdmin.getInstance().Firestore.runTransaction(async (transaction) => {
     const memberDoc = await transaction.get(memberRef);
 
     if (memberDoc.exists === false) {
-      throw new CustomServerError({ statusCode: 400, message: '현존하지 않는 사용자 입니다.' });
+      throw new CustomServerError({ statusCode: 400, message: '존재하지 않는 사용자' });
     }
+
     const newMessageRef = memberRef.collection(MSG_COL).doc();
     const newMessageBody: {
       message: string;
@@ -51,15 +51,18 @@ async function post({
 }
 
 async function list({ uid }: { uid: string }) {
-  const memberRef = Firestore.collection(MEMBER_COL).doc(uid);
-  const listData = await Firestore.runTransaction(async (transaction: { get: (arg0: any) => any }) => {
+  const memberRef = FirebaseAdmin.getInstance().Firestore.collection(MEMBER_COL).doc(uid);
+
+  const listData = await FirebaseAdmin.getInstance().Firestore.runTransaction(async (transaction) => {
     const memberDoc = await transaction.get(memberRef);
+
     if (memberDoc.exists === false) {
       throw new CustomServerError({ statusCode: 400, message: '존재하지 않는 사용자' });
     }
+
     const messageCol = memberRef.collection(MSG_COL);
     const messageColDoc = await transaction.get(messageCol);
-    const data = messageColDoc.docs.map((mapValue: { data: () => Omit<InMessageServer, 'id'>; id: any }) => {
+    const data = messageColDoc.docs.map((mapValue) => {
       const docData = mapValue.data() as Omit<InMessageServer, 'id'>;
       const returnData = {
         ...docData,

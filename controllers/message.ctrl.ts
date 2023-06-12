@@ -33,7 +33,7 @@ async function postReply(req: NextApiRequest, res: NextApiResponse) {
     throw new BadReqError('uid가 존재하지 않습니다.');
   }
   if (messageId === undefined) {
-    throw new BadReqError('메세지가 존재하지 않습니다.');
+    throw new BadReqError('메세지 아이디가 존재하지 않습니다.');
   }
   if (reply === undefined) {
     throw new BadReqError('reply가 누락되어 있습니다.');

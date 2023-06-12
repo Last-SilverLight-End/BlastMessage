@@ -7,7 +7,7 @@ interface MessageBase {
   /**댓글 */
   reply?: string;
 
-  authore?: {
+  author?: {
     displayName: string;
     photoURL?: string;
   };

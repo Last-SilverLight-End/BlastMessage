@@ -1,5 +1,6 @@
 import { Avatar, Box, Button, Divider, Flex, Text, Textarea } from '@chakra-ui/react';
 import ResizeTextArea from 'react-textarea-autosize';
+import { useState } from 'react';
 import { InMessage } from '@/models/message/in_message';
 import convertDateToString from '@/utils/convert_date_toString';
 
@@ -9,10 +10,29 @@ interface Props {
   displayName: string;
   owner: boolean;
   item: InMessage;
+  onSendComplete: () => void;
 }
 
-const MessageItem = function ({ uid, displayName, owner, photoURL, item }: Props) {
+const MessageItem = function ({ uid, displayName, owner, photoURL, item, onSendComplete }: Props) {
   const haveReply = item.reply !== undefined;
+  const [reply, setReply] = useState('');
+
+  async function postReply() {
+    const res = await fetch('api/message_add_reply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        uid,
+        messageId: item.id,
+        reply,
+      }),
+    });
+    console.info('postreply status : ', res.status);
+
+    if (res.status < 300) {
+      onSendComplete();
+    }
+  }
   return (
     <Box borderRadius="md" width="full" bg="white" boxShadow="md">
       <Box>
@@ -29,6 +49,7 @@ const MessageItem = function ({ uid, displayName, owner, photoURL, item }: Props
           </Text>
         </Flex>
       </Box>
+
       <Box p="2">
         <Box borderRadius="md" borderWidth="1px" padding="2">
           <Text whiteSpace="pre-line" fontSize="sm">
@@ -73,9 +94,24 @@ const MessageItem = function ({ uid, displayName, owner, photoURL, item }: Props
                   fontSize="xs"
                   as={ResizeTextArea}
                   placeholder="댓글을 입력 하세요"
+                  value={reply}
+                  onChange={(e) => {
+                    setReply(e.currentTarget.value);
+                  }}
                 />
               </Box>
-              <Button colorScheme="pink" bgColor="#006800" variant="solid" size="sm">
+              <Button
+                isDisabled={reply.length === 0 || reply === ''}
+                colorScheme="pink"
+                bgColor="#006800"
+                variant="solid"
+                size="sm"
+                onClick={() => {
+                  console.log(`reply is : ${reply}`);
+                  console.log(reply.length);
+                  postReply();
+                }}
+              >
                 등록
               </Button>
             </Box>

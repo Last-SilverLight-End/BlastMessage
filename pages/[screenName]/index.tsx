@@ -27,11 +27,55 @@ interface UserProps {
   userMessage: string | null;
 }
 
+async function postMsg({
+  uid,
+  message,
+  author,
+}: {
+  uid: string;
+  message: string;
+  author?: {
+    displayName: string;
+    photoURL?: string;
+  };
+}) {
+  if (message.length <= 0) {
+    return {
+      result: false,
+      message: '메세지가 없습니다 입력해주세요',
+    };
+  }
+
+  try {
+    await fetch('/api/message_add', {
+      method: 'post',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        uid,
+        message,
+        author,
+      }),
+    });
+    return {
+      result: true,
+    };
+  } catch (err) {
+    console.log(err);
+    return {
+      result: false,
+      message: '메세지 등록 실패',
+    };
+  }
+}
+
 const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
-  const [check, setCheck] = useState<boolean>(true);
+  const [check, setCheck] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [IsNoOne, setNoOne] = useState<boolean>(true);
   const [messageList, setMessageList] = useState<Array<InMessage>>([]);
+  const [messageListFetchTrig, setMessageListFetchTrig] = useState(false);
   const { authUser } = useAuth();
   const toast = useToast();
 
@@ -49,9 +93,7 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
   useEffect(() => {
     if (userInfo === null) return;
     fetchMessageList(userInfo.uid);
-  }, [userInfo]);
-
-  const isOwner = authUser !== null && authUser.uid === userInfo.uid;
+  }, [userInfo, messageListFetchTrig]);
 
   console.log(userInfo);
   if (userInfo === null || userInfo === undefined) {
@@ -60,6 +102,8 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
   if (userInfo.photoURL == null) {
     return <Text>잘못되었습니다</Text>;
   }
+
+  const isOwner = authUser !== null && authUser.uid === userInfo.uid;
 
   const onChangeMessage = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     console.log(message);
@@ -89,7 +133,7 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
   };
 
   return (
-    <ServiceLayout title="username" minH="100vh" backgroundColor="gray.50">
+    <ServiceLayout title={`${userInfo.displayName} 의 홈`} minH="100vh" backgroundColor="gray.50">
       <Box maxW="md" mx="auto" pt="6">
         <Box borderWidth="1px" borderRadius="lg" overflow="hidden" mb="2" bg="white">
           <Flex>
@@ -124,7 +168,38 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
               value={message}
               onChange={onChangeMessage}
             />
-            <Button disabled={check} bgColor="#26bd00d6" color="white" colorScheme="yellow" variant="solid" size="sm">
+            <Button
+              disabled={message.length === 0}
+              bgColor="#26bd00d6"
+              color="white"
+              colorScheme="yellow"
+              variant="solid"
+              size="sm"
+              onClick={async () => {
+                const postData: {
+                  message: string;
+                  uid: string;
+                  author?: {
+                    displayName: string;
+                    photoURL?: string;
+                  };
+                } = {
+                  message,
+                  uid: userInfo.uid,
+                };
+                if (IsNoOne === false) {
+                  postData.author = {
+                    photoURL: authUser?.photoURL ?? 'https://bit.ly/broken-link',
+                    displayName: authUser?.displayName ?? 'isNoOne',
+                  };
+                }
+                const messageRes = await postMsg(postData);
+                if (messageRes.result === false) {
+                  toast({ title: '메세지 등록 실패', position: 'top-right' });
+                }
+                setMessage('');
+              }}
+            >
               올리기
             </Button>
           </Flex>
@@ -145,6 +220,9 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
               displayName={userInfo.displayName ?? ''}
               photoURL={userInfo.photoURL ?? 'https://bit.ly/broken-link'}
               owner={isOwner}
+              onSendComplete={() => {
+                setMessageListFetchTrig((prev) => !prev);
+              }}
             />
           ))}
 
