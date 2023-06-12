@@ -4,7 +4,7 @@ import { Box, Center, Flex, Heading } from '@chakra-ui/react';
 
 import { ServiceLayout } from '@/Components/ServiceLayout';
 import { GoogleLoginButton } from '@/Components/GoogleLoginButton';
-import FirebaseClient from '@/models/firebase_client';
+
 import { useAuth } from '@/contexts/auth_user.context';
 
 const IndexPage: NextPage = function () {

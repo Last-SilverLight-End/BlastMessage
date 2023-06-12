@@ -8,12 +8,13 @@ import MessageCrtl from '@/controllers/message.ctrl';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
-  const supportedMethod = ['POST'];
+  const supportedMethod = ['GET'];
   try {
     checkSupportMethod(supportedMethod, method);
-    await MessageCrtl.postReply(req, res);
+    await MessageCrtl.get(req, res);
   } catch (err) {
     console.error(err);
+    //에러 처리
     handleError(err, res);
   }
 }
