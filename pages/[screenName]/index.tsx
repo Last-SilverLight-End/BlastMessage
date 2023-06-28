@@ -23,7 +23,7 @@ import { InAuthUser } from '@/models/in_auth_user';
 import MessageItem from '@/Components/message_item';
 import { InMessage } from '@/models/message/in_message';
 import useIsMount from '@/Components/useIsMount';
-
+import { useQuery } from 'react-query';
 interface UserProps {
   userInfo: InAuthUser | null | undefined;
   userMessage: string | null;
@@ -83,26 +83,6 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
   const { authUser } = useAuth();
   const toast = useToast();
   const isMount = useIsMount();
-  async function fetchMessageList(uid: string) {
-    try {
-      const res = await fetch(`/api/message_list?uid=${uid}&page=${page}&size=3`);
-      if (res.status === 200) {
-        const data: {
-          totalElementCount: number;
-          totalPages: number;
-          page: number;
-          size: number;
-          content: InMessage[];
-        } = await res.json();
-        console.log('asdf');
-        setTotalPages(data.totalPages);
-        console.log('lets go :', ...data.content);
-        setMessageList((prev) => [...prev, ...data.content]);
-      }
-    } catch (err) {
-      console.log('error : ', err);
-    }
-  }
 
   async function fetchMessageInfo({ uid, messageId }: { uid: string; messageId: string }) {
     try {
@@ -123,12 +103,31 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
       console.error(err);
     }
   }
+  const messageListQueryKey = ['messageList', userInfo?.uid, page, messageListFetchTrig];
 
-  useEffect(() => {
-    const ignore = false;
-    if (userInfo === null) return;
-    if (!ignore) fetchMessageList(userInfo.uid);
-  }, [userInfo, messageListFetchTrig, page]);
+  useQuery(messageListQueryKey, async () => await axios.get<
+    {
+      totalElementCount: number;
+      totalPages: number;
+      page: number;
+      size: number;
+      content: InMessage[];
+    }>(`/api/message_list?uid=${userInfo?.uid}&page=${page}&size=10`),
+    {
+      keepPreviousData: true,
+      refetchOnWindowFocus: false,
+      onSuccess: (data) => {
+        setTotalPages(data.data.totalPages);
+        if (page === 1) {
+          setMessageList([...data.data.content]);
+          return;
+        }
+        setMessageList((prev) => [...prev, ...data.data.content]);
+      },
+    },
+  );
+
+
 
   console.log(userInfo);
   if (userInfo === null || userInfo === undefined) {
@@ -233,7 +232,10 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
                   toast({ title: '메세지 등록 실패', position: 'top-right' });
                 }
                 setMessage('');
-                setMessageListFetchTrig((prev) => !prev);
+                setPage(1);
+                setTimeout(() => {
+                  setMessageListFetchTrig((prev) => !prev);
+                }, 75);
               }}
             >
               올리기
