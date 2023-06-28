@@ -22,6 +22,7 @@ import { useAuth } from '@/contexts/auth_user.context';
 import { InAuthUser } from '@/models/in_auth_user';
 import MessageItem from '@/Components/message_item';
 import { InMessage } from '@/models/message/in_message';
+import useIsMount from '@/Components/useIsMount';
 
 interface UserProps {
   userInfo: InAuthUser | null | undefined;
@@ -74,18 +75,29 @@ async function postMsg({
 const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
   const [check, setCheck] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [IsNoOne, setNoOne] = useState<boolean>(true);
   const [messageList, setMessageList] = useState<Array<InMessage>>([]);
   const [messageListFetchTrig, setMessageListFetchTrig] = useState(false);
   const { authUser } = useAuth();
   const toast = useToast();
-
+  const isMount = useIsMount();
   async function fetchMessageList(uid: string) {
     try {
-      const res = await fetch(`/api/message_list?uid=${uid}`);
+      const res = await fetch(`/api/message_list?uid=${uid}&page=${page}&size=3`);
       if (res.status === 200) {
-        const data = await res.json();
-        setMessageList(data);
+        const data: {
+          totalElementCount: number;
+          totalPages: number;
+          page: number;
+          size: number;
+          content: InMessage[];
+        } = await res.json();
+        console.log('asdf');
+        setTotalPages(data.totalPages);
+        console.log('lets go :', ...data.content);
+        setMessageList((prev) => [...prev, ...data.content]);
       }
     } catch (err) {
       console.log('error : ', err);
@@ -113,9 +125,10 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
   }
 
   useEffect(() => {
+    const ignore = false;
     if (userInfo === null) return;
-    fetchMessageList(userInfo.uid);
-  }, [userInfo, messageListFetchTrig]);
+    if (!ignore) fetchMessageList(userInfo.uid);
+  }, [userInfo, messageListFetchTrig, page]);
 
   console.log(userInfo);
   if (userInfo === null || userInfo === undefined) {
@@ -275,9 +288,19 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
             }}
           />*/}
         </VStack>
-        <Button width="full" mt="2" fontSize="sm" leftIcon={<TriangleDownIcon />}>
-          더보기
-        </Button>
+        {totalPages > page && (
+          <Button
+            width="full"
+            mt="2"
+            fontSize="sm"
+            leftIcon={<TriangleDownIcon />}
+            onClick={() => {
+              setPage((p) => p + 1);
+            }}
+          >
+            더보기
+          </Button>
+        )}
       </Box>
     </ServiceLayout>
   );
