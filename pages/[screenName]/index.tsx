@@ -17,13 +17,14 @@ import FlexiableTextArea from 'react-textarea-autosize';
 import { SetStateAction, useEffect, useState } from 'react';
 
 import axios, { AxiosResponse } from 'axios';
+import { useQuery } from 'react-query';
 import { ServiceLayout } from '@/Components/ServiceLayout';
 import { useAuth } from '@/contexts/auth_user.context';
 import { InAuthUser } from '@/models/in_auth_user';
 import MessageItem from '@/Components/message_item';
 import { InMessage } from '@/models/message/in_message';
 import useIsMount from '@/Components/useIsMount';
-import { useQuery } from 'react-query';
+
 interface UserProps {
   userInfo: InAuthUser | null | undefined;
   userMessage: string | null;
@@ -105,14 +106,17 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
   }
   const messageListQueryKey = ['messageList', userInfo?.uid, page, messageListFetchTrig];
 
-  useQuery(messageListQueryKey, async () => await axios.get<
-    {
-      totalElementCount: number;
-      totalPages: number;
-      page: number;
-      size: number;
-      content: InMessage[];
-    }>(`/api/message_list?uid=${userInfo?.uid}&page=${page}&size=10`),
+  useQuery(
+    messageListQueryKey,
+    async () =>
+      // eslint-disable-next-line no-return-await
+      await axios.get<{
+        totalElementCount: number;
+        totalPages: number;
+        page: number;
+        size: number;
+        content: InMessage[];
+      }>(`/api/message_list?uid=${userInfo?.uid}&page=${page}&size=10`),
     {
       keepPreviousData: true,
       refetchOnWindowFocus: false,
@@ -127,12 +131,12 @@ const UserHomePage: NextPage<UserProps> = function ({ userInfo }: any) {
     },
   );
 
-
-
   console.log(userInfo);
+
   if (userInfo === null || userInfo === undefined) {
     return <Text> 사용자를 찾을수 없습니다 새로고침이나 다시 로그인 해주세요</Text>;
   }
+
   if (userInfo.photoURL == null) {
     return <Text>잘못되었습니다</Text>;
   }

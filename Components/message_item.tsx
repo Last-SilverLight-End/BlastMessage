@@ -1,9 +1,25 @@
-import { Avatar, Box, Button, Divider, Flex, IconButton, Menu, MenuButton, MenuItem, MenuList, Spacer, Text, Textarea } from '@chakra-ui/react';
+import {
+  Avatar,
+  Box,
+  Button,
+  Divider,
+  Flex,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Spacer,
+  Text,
+  Textarea,
+  useToast,
+} from '@chakra-ui/react';
 import ResizeTextArea from 'react-textarea-autosize';
 import { useState } from 'react';
 import { InMessage } from '@/models/message/in_message';
 import convertDateToString from '@/utils/convert_date_toString';
 import MoreBtnIcon from './more_btn_icon';
+import FirebaseClient from '@/models/firebase_client';
 
 interface Props {
   uid: string;
@@ -16,6 +32,7 @@ interface Props {
 
 const MessageItem = function ({ uid, displayName, owner, photoURL, item, onSendComplete }: Props) {
   const haveReply = item.reply !== undefined;
+  const toast = useToast();
   const [reply, setReply] = useState('');
 
   async function postReply() {
@@ -34,6 +51,29 @@ const MessageItem = function ({ uid, displayName, owner, photoURL, item, onSendC
       onSendComplete();
     }
   }
+
+  async function updateMessage({ deny }: { deny: boolean }) {
+    const token = await FirebaseClient.getInstance().Auth.currentUser?.getIdToken();
+    if (token === undefined) {
+      toast({
+        title: '로그인 사용자만 가능합니다.',
+      });
+      return;
+    }
+    const res = await fetch('api/message_deny', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', authorization: token },
+      body: JSON.stringify({
+        uid,
+        messageId: item.id,
+        deny,
+      }),
+    });
+    console.info('postreply status : ', res.status);
+    if (res.status < 300) {
+      onSendComplete();
+    }
+  }
   return (
     <Box borderRadius="md" width="full" bg="white" boxShadow="md">
       <Box>
@@ -48,21 +88,30 @@ const MessageItem = function ({ uid, displayName, owner, photoURL, item, onSendC
           <Text whiteSpace="pre-line" fontSize="xx-small" color="gray.300" m="1">
             {convertDateToString(item.createAt)}
           </Text>
-          <Spacer>
-
-          </Spacer>
+          <Spacer />
           {owner && (
             <Menu>
-              <MenuButton as={IconButton} icon={<MoreBtnIcon />}
-                width="24px" height="24px" borderRadius="full" variant="link" size="xs" />
+              <MenuButton
+                as={IconButton}
+                icon={<MoreBtnIcon />}
+                width="24px"
+                height="24px"
+                borderRadius="full"
+                variant="link"
+                size="xs"
+              />
 
               <MenuList>
-                <MenuItem>비공개 처리</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    updateMessage({ deny: true });
+                  }}
+                >
+                  비공개 처리
+                </MenuItem>
               </MenuList>
             </Menu>
-          )
-
-          }
+          )}
         </Flex>
       </Box>
 
