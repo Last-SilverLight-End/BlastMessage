@@ -31,7 +31,6 @@ interface Props {
 }
 
 const MessageItem = function ({ uid, displayName, owner, photoURL, item, onSendComplete }: Props) {
-  const haveReply = item.reply !== undefined;
   const toast = useToast();
   const [reply, setReply] = useState('');
 
@@ -61,7 +60,7 @@ const MessageItem = function ({ uid, displayName, owner, photoURL, item, onSendC
       return;
     }
     const res = await fetch('api/message_deny', {
-      method: 'POST',
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json', authorization: token },
       body: JSON.stringify({
         uid,
@@ -74,6 +73,8 @@ const MessageItem = function ({ uid, displayName, owner, photoURL, item, onSendC
       onSendComplete();
     }
   }
+  const haveReply = item.reply !== undefined;
+  const isDeny = item.deny !== undefined ? item.deny === true : false;
   return (
     <Box borderRadius="md" width="full" bg="white" boxShadow="md">
       <Box>
@@ -104,10 +105,10 @@ const MessageItem = function ({ uid, displayName, owner, photoURL, item, onSendC
               <MenuList>
                 <MenuItem
                   onClick={() => {
-                    updateMessage({ deny: true });
+                    updateMessage({ deny: item.deny !== undefined ? !item.deny : true });
                   }}
                 >
-                  비공개 처리
+                  {isDeny ? '비공개 처리 해제' : '비공개 처리'}
                 </MenuItem>
               </MenuList>
             </Menu>
@@ -142,6 +143,7 @@ const MessageItem = function ({ uid, displayName, owner, photoURL, item, onSendC
             </Box>
           </Box>
         )}
+
         {haveReply === false && owner && (
           <Box pt="2">
             <Divider />

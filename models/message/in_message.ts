@@ -11,6 +11,7 @@ interface MessageBase {
     displayName: string;
     photoURL?: string;
   };
+  deny?: boolean;
 }
 
 export interface InMessage extends MessageBase {
